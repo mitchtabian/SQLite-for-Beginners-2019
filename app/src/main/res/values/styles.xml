@@ -8,4 +8,6 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:statusBarColor">@color/darkGrey</item> <!-- Requires api 21 -->
     </style>
+
+
 </resources>
