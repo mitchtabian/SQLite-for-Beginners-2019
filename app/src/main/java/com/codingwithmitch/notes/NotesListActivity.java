@@ -1,5 +1,6 @@
 package com.codingwithmitch.notes;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -62,7 +63,8 @@ public class NotesListActivity extends AppCompatActivity implements NotesRecycle
 
     @Override
     public void onNoteClick(int position) {
-        Log.d(TAG, "onNoteClick: " + position);
+        Intent intent = new Intent(this, NoteActivity.class);
+        startActivity(intent);
     }
 }
 
