@@ -7,48 +7,30 @@
     android:layout_height="match_parent"
     tools:context=".NotesListActivity"
     android:background="#e6e6e6">
-
-    <LinearLayout
+    
+    <android.support.design.widget.AppBarLayout
+        android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <android.support.design.widget.AppBarLayout
+        <android.support.v7.widget.Toolbar
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimaryDark">
+            android:background="?attr/colorPrimary"
+            app:layout_scrollFlags="scroll|enterAlways"
+            android:id="@+id/notes_toolbar"/>
 
-            <android.support.v7.widget.Toolbar
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/notes_toolbar"
-                android:elevation="4dp"
-                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+    </android.support.design.widget.AppBarLayout>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textSize="23sp"
-                    android:textColor="#000"
-                    android:text="Notes"/>
+    <android.support.v7.widget.RecyclerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/recyclerView"
+        android:orientation="vertical"
+        android:padding="5dp"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-            </android.support.v7.widget.Toolbar>
-
-        </android.support.design.widget.AppBarLayout>
-
-
-        <android.support.v7.widget.RecyclerView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/recyclerView"
-            android:orientation="vertical"
-            android:padding="5dp">
-
-        </android.support.v7.widget.RecyclerView>
-
-
-    </LinearLayout>
+    </android.support.v7.widget.RecyclerView>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"
@@ -71,9 +53,7 @@
             android:layout_centerInParent="true"
             android:visibility="invisible"/>
 
-
     </RelativeLayout>
 
-
-
+    
 </android.support.design.widget.CoordinatorLayout>

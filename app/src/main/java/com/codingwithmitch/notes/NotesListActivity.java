@@ -57,6 +57,9 @@ public class NotesListActivity extends AppCompatActivity implements
 
         setupRecyclerView();
         mNoteDao = AppDatabase.getDatabase(this).noteDataDao();
+		
+		setSupportActionBar((Toolbar)findViewById(R.id.notes_toolbar));
+        setTitle("Notes");
     }
 
 
