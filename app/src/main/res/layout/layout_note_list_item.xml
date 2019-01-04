@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="100"
+    android:background="@color/lightYellow"
+    android:gravity="center_vertical">
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:background="@color/mediumYellow"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/note_title"
+        android:textSize="23sp"
+        android:layout_weight="75"
+        android:text="Some Note Title"
+        android:textColor="#000"
+        android:lines="1"
+        android:padding="10dp" />
+
+    <View
+        android:layout_width="0dp"
+        android:layout_height="10dp"
+        android:layout_weight="4"/>
+
+    <TextView
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/note_timestamp"
+        android:textSize="17sp"
+        android:layout_weight="20"
+        android:text="Dec 1 2017"
+        android:padding="10dp" />
+
+</LinearLayout>

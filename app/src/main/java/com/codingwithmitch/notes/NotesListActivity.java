@@ -18,5 +18,8 @@ public class NotesListActivity extends AppCompatActivity {
         Note note = new Note("some title", "some content for the note", null);
 
         Log.d(TAG, "onCreate: my first note: " + note.toString());
+
     }
+
+
 }
