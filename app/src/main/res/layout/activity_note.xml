@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/lightYellow">
-    
+
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -13,7 +13,7 @@
 
         <android.support.v7.widget.Toolbar
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/note_toolbar">
 
             <include layout="@layout/layout_note_toolbar"/>
@@ -22,12 +22,13 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <EditText
+    <com.codingwithmitch.notes.LinedEditText
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/note_text"
         android:textSize="23sp"
         android:textColor="#000"
-        android:padding="5dp"/>
+        android:padding="5dp"
+        android:gravity="top"/>
 
 </LinearLayout>
