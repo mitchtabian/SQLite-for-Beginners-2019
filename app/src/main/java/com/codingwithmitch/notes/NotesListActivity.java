@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.codingwithmitch.notes.async.RetrieveAsyncTask;
 import com.codingwithmitch.notes.models.Note;
 import com.codingwithmitch.notes.persistence.AppDatabase;
 import com.codingwithmitch.notes.persistence.NoteDao;
+import com.codingwithmitch.notes.util.Utility;
 import com.codingwithmitch.notes.util.VerticalSpacingItemDecorator;
 
 
@@ -57,8 +59,8 @@ public class NotesListActivity extends AppCompatActivity implements
 
         setupRecyclerView();
         mNoteDao = AppDatabase.getDatabase(this).noteDataDao();
-		
-		setSupportActionBar((Toolbar)findViewById(R.id.notes_toolbar));
+
+        setSupportActionBar((Toolbar)findViewById(R.id.notes_toolbar));
         setTitle("Notes");
     }
 
@@ -66,7 +68,20 @@ public class NotesListActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        retrieveNotes();
+//        retrieveNotes();
+        insertFakeNotes();
+    }
+
+    private void insertFakeNotes(){
+
+        for(int i = 0; i < 1000; i++){
+            Note note = new Note();
+            note.setTitle("title #" + i);
+            note.setContent("content #: " + i);
+            note.setTimestamp(Utility.getCurrentTimeStamp());
+            mNotes.add(note);
+        }
+        mNoteRecyclerAdapter.notifyDataSetChanged();
     }
 
     private void retrieveNotes() {

@@ -1,55 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout
+<LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="@color/lightYellow"
-    android:id="@+id/coordinator_layout"
-    >
+    android:orientation="vertical"
+    android:background="@color/lightYellow">
 
-    <LinearLayout
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/colorPrimaryDark">
+
+        <android.support.v7.widget.Toolbar
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/note_toolbar">
+
+            <include layout="@layout/layout_note_toolbar"/>
+
+        </android.support.v7.widget.Toolbar>
+
+    </android.support.design.widget.AppBarLayout>
+
+    <com.codingwithmitch.notes.LinedEditText
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
-
-        <android.support.design.widget.AppBarLayout
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorPrimaryDark">
-
-            <android.support.v7.widget.Toolbar
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/note_toolbar"
-                android:elevation="4dp"
-                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-
-                <include layout="@layout/layout_note_toolbar"/>
-
-            </android.support.v7.widget.Toolbar>
-
-        </android.support.design.widget.AppBarLayout>
-
-
-        <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <com.codingwithmitch.notes.LinedEditText
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/note_text"
-                android:textSize="23sp"
-                android:background="@android:color/transparent"
-                android:gravity="top"
-                android:textColor="#000" />
-
-
-        </RelativeLayout>
-
-
-    </LinearLayout>
-
-</android.support.design.widget.CoordinatorLayout>
+        android:id="@+id/note_text"
+        android:textSize="23sp"
+        android:background="@android:color/transparent"
+        android:gravity="top"
+        android:textColor="#000"
+        android:padding="5dp"/>
+    
+</LinearLayout>

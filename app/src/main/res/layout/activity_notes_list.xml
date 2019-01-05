@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     tools:context=".NotesListActivity"
     android:background="#e6e6e6">
-    
+
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
@@ -55,5 +55,5 @@
 
     </RelativeLayout>
 
-    
+
 </android.support.design.widget.CoordinatorLayout>

@@ -39,7 +39,6 @@ public class NoteActivity extends AppCompatActivity implements
     private static final int EDIT_MODE_DISABLED = 0;
 
     //ui components
-    private CoordinatorLayout mCoordinatorLayout;
     private LinedEditText mLinedEditText;
     private ImageButton mCheck, mBackArrow;
     private RelativeLayout mCheckContainer, mBackArrowContainer;
@@ -59,7 +58,6 @@ public class NoteActivity extends AppCompatActivity implements
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note);
-        mCoordinatorLayout = findViewById(R.id.coordinator_layout);
         mLinedEditText = findViewById(R.id.note_text);
         mCheck = findViewById(R.id.toolbar_check);
         mBackArrow = findViewById(R.id.toolbar_back_arrow);
@@ -222,7 +220,7 @@ public class NoteActivity extends AppCompatActivity implements
         InputMethodManager inputMethodManager =
                 (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
         inputMethodManager.toggleSoftInputFromWindow(
-                mCoordinatorLayout.getApplicationWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+                mLinedEditText.getWindowToken(), InputMethodManager.SHOW_FORCED, 0);
     }
 
     private void hideSoftkeyboard(){
