@@ -21,6 +21,7 @@ public class NoteActivity extends AppCompatActivity {
 
     // vars
     private boolean mIsNewNote;
+    private Note mNoteInitial;
 
 
     @Override
@@ -33,16 +34,17 @@ public class NoteActivity extends AppCompatActivity {
 
         if(getIncomingIntent()){
             // this is a new note (EDIT MODE)
+            setNoteProperties();
         }
         else{
             // this is note a new note (VIEW MODE)
+            setNewNoteProperties();
         }
     }
 
     private boolean getIncomingIntent(){
         if(getIntent().hasExtra("selected_note")){
-            Note incomingNote = getIntent().getParcelableExtra("selected_note");
-
+            mNoteInitial = getIntent().getParcelableExtra("selected_note");
 
             mIsNewNote = false;
             return false;
@@ -51,7 +53,16 @@ public class NoteActivity extends AppCompatActivity {
         return true;
     }
 
+    private void setNewNoteProperties(){
+        mViewTitle.setText("Note Title");
+        mEditTitle.setText("Note Title");
+    }
 
+    private void setNoteProperties(){
+        mViewTitle.setText(mNoteInitial.getTitle());
+        mEditTitle.setText(mNoteInitial.getTitle());
+        mLinedEditText.setText(mNoteInitial.getContent());
+    }
 
 }
 
