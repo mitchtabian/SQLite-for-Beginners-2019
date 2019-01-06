@@ -47,8 +47,8 @@ public class NoteActivity extends AppCompatActivity implements
 
     //vars
     private GestureDetector mGestureDetector;
-    private int mEditModeState = EDIT_MODE_DISABLED;
-    private boolean mIsNewNote = false;
+    private int mMode = EDIT_MODE_DISABLED;
+    private boolean mIsNewNote;
     private Note mNoteInitial = new Note();
     private Note mNoteFinal = new Note();
     private NoteDao mNoteDao;
@@ -76,20 +76,32 @@ public class NoteActivity extends AppCompatActivity implements
         mEditTitle.addTextChangedListener(new ContentTextWatcher());
 
         mNoteDao = AppDatabase.getDatabase(this).noteDataDao();
-    }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
         if(getIncomingIntent()){
-            setNoteProperties();
-            disableContentInteraction();
-        }
-        else{
             setNewNoteProperties();
             enableEditMode();
         }
+        else{
+            setNoteProperties();
+            disableContentInteraction();
+        }
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("mode", mMode);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mMode = savedInstanceState.getInt("mode");
+        if(mMode == EDIT_MODE_ENABLED){
+            enableEditMode();
+        }
+    }
+
 
     private void saveChanges(){
         if(mIsNewNote){
@@ -135,10 +147,10 @@ public class NoteActivity extends AppCompatActivity implements
             mNoteFinal.setUid(incomingNote.getUid());
 
             mIsNewNote = false;
-            return true;
+            return false;
         }
         mIsNewNote = true;
-        return false;
+        return true;
     }
 
     private void appendNewLines(){
@@ -163,7 +175,7 @@ public class NoteActivity extends AppCompatActivity implements
 
         showSoftkeyboard();
 
-        mEditModeState = EDIT_MODE_ENABLED;
+        mMode = EDIT_MODE_ENABLED;
     }
 
 
@@ -179,7 +191,7 @@ public class NoteActivity extends AppCompatActivity implements
 
         disableContentInteraction();
 
-        mEditModeState = EDIT_MODE_DISABLED;
+        mMode = EDIT_MODE_DISABLED;
 
         // Check if they typed anything into the note. Don't want to save an empty note.
         String temp = mLinedEditText.getText().toString();
@@ -256,7 +268,7 @@ public class NoteActivity extends AppCompatActivity implements
 
     @Override
     public void onBackPressed() {
-        if(mEditModeState == EDIT_MODE_ENABLED){
+        if(mMode == EDIT_MODE_ENABLED){
             onClick(mCheck);
         }
         else{
@@ -272,7 +284,7 @@ public class NoteActivity extends AppCompatActivity implements
         if(v.getId() != R.id.toolbar_back_arrow
                 && v.getId() != R.id.toolbar_check){
             if(v.getId() == R.id.note_text){
-                if(mEditModeState == EDIT_MODE_DISABLED){
+                if(mMode == EDIT_MODE_DISABLED){
                     return mGestureDetector.onTouchEvent(event);
                 }
 

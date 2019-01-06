@@ -29,17 +29,12 @@ public class LinedEditText extends android.support.v7.widget.AppCompatEditText {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        int count = getLineCount();
 
         // get the height of the view
         int height = ((View)this.getParent()).getHeight();
 
         int lineHeight = getLineHeight();
         int numberOfLines = height / lineHeight;
-
-        if(count > numberOfLines){
-            numberOfLines = count;
-        }
 
         Rect r = mRect;
         Paint paint = mPaint;

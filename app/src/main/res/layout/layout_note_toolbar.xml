@@ -4,13 +4,13 @@
     android:layout_width="match_parent"
     android:layout_height="?attr/actionBarSize"
     android:weightSum="100"
-    android:background="@color/colorPrimaryDark">
+    android:background="@color/colorPrimaryDark"
+    android:gravity="center_vertical">
 
     <RelativeLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="10"
-        android:layout_gravity="center_vertical"
         android:id="@+id/back_arrow_container">
 
         <ImageButton
@@ -29,7 +29,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_weight="10"
-        android:layout_gravity="center_vertical"
         android:visibility="gone"
         android:id="@+id/check_container">
 
@@ -50,7 +49,6 @@
         android:id="@+id/note_text_title"
         android:text="title of note"
         android:textColor="#000"
-        android:layout_gravity="center_vertical"
         android:layout_marginStart="15dp"
         android:textSize="23sp"
         android:visibility="visible"/>
@@ -62,7 +60,6 @@
         android:id="@+id/note_edit_title"
         android:text="title of note"
         android:textColor="#000"
-        android:layout_gravity="center_vertical"
         android:layout_marginStart="15dp"
         android:textSize="23sp"
         android:background="#fff"
