@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.codingwithmitch.notes.models.Note;
 import com.codingwithmitch.notes.persistence.NoteRepository;
+import com.codingwithmitch.notes.util.Utility;
 
 public class NoteActivity extends AppCompatActivity implements
         View.OnTouchListener,
@@ -152,7 +153,7 @@ public class NoteActivity extends AppCompatActivity implements
         if(temp.length() > 0){
             mNoteFinal.setTitle(mEditTitle.getText().toString());
             mNoteFinal.setContent(mLinedEditText.getText().toString());
-            String timestamp = "Jan 2019";
+            String timestamp = Utility.getCurrentTimeStamp();
             mNoteFinal.setTimestamp(timestamp);
 
             // If the note was altered, save it.
