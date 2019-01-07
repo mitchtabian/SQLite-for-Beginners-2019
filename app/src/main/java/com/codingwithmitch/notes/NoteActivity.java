@@ -55,12 +55,13 @@ public class NoteActivity extends AppCompatActivity implements
 
         if(getIncomingIntent()){
             // this is a new note (EDIT MODE)
+            // this is not a new note (VIEW MODE)
             setNewNoteProperties();
             enableEditMode();
         }
         else{
-            // this is not a new note (VIEW MODE)
-			setNoteProperties();
+            setNoteProperties();
+            disableContentInteraction();
         }
     }
 
@@ -69,6 +70,7 @@ public class NoteActivity extends AppCompatActivity implements
         mLinedEditText.setOnTouchListener(this);
         mCheck.setOnClickListener(this);
         mViewTitle.setOnClickListener(this);
+        mBackArrow.setOnClickListener(this);
     }
 
     private boolean getIncomingIntent(){
@@ -84,6 +86,22 @@ public class NoteActivity extends AppCompatActivity implements
         return true;
     }
 
+    private void disableContentInteraction(){
+        mLinedEditText.setKeyListener(null);
+        mLinedEditText.setFocusable(false);
+        mLinedEditText.setFocusableInTouchMode(false);
+        mLinedEditText.setCursorVisible(false);
+        mLinedEditText.clearFocus();
+    }
+
+    private void enableContentInteraction(){
+        mLinedEditText.setKeyListener(new EditText(this).getKeyListener());
+        mLinedEditText.setFocusable(true);
+        mLinedEditText.setFocusableInTouchMode(true);
+        mLinedEditText.setCursorVisible(true);
+        mLinedEditText.requestFocus();
+    }
+
     private void enableEditMode(){
         mBackArrowContainer.setVisibility(View.GONE);
         mCheckContainer.setVisibility(View.VISIBLE);
@@ -92,6 +110,8 @@ public class NoteActivity extends AppCompatActivity implements
         mEditTitle.setVisibility(View.VISIBLE);
 
         mMode = EDIT_MODE_ENABLED;
+
+        enableContentInteraction();
     }
 
     private void disableEditMode(){
@@ -102,6 +122,8 @@ public class NoteActivity extends AppCompatActivity implements
         mEditTitle.setVisibility(View.GONE);
 
         mMode = EDIT_MODE_DISABLED;
+
+        disableContentInteraction();
     }
 
     private void setNewNoteProperties(){
@@ -170,6 +192,10 @@ public class NoteActivity extends AppCompatActivity implements
     @Override
     public void onClick(View view) {
         switch (view.getId()){
+            case R.id.toolbar_back_arrow:{
+                finish();
+                break;
+            }
             case R.id.toolbar_check:{
                 disableEditMode();
                 break;
