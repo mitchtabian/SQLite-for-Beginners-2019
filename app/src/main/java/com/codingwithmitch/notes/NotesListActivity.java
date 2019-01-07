@@ -1,6 +1,8 @@
 package com.codingwithmitch.notes;
 
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,12 +15,11 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.codingwithmitch.notes.adapters.NotesRecyclerAdapter;
-import com.codingwithmitch.notes.async.AsyncCallback;
 import com.codingwithmitch.notes.async.DeleteAsyncTask;
-import com.codingwithmitch.notes.async.RetrieveAsyncTask;
 import com.codingwithmitch.notes.models.Note;
-import com.codingwithmitch.notes.persistence.AppDatabase;
+import com.codingwithmitch.notes.persistence.NoteDatabase;
 import com.codingwithmitch.notes.persistence.NoteDao;
+import com.codingwithmitch.notes.persistence.NoteRepository;
 import com.codingwithmitch.notes.util.Utility;
 import com.codingwithmitch.notes.util.VerticalSpacingItemDecorator;
 
@@ -42,9 +43,8 @@ public class NotesListActivity extends AppCompatActivity implements
     private ArrayList<Note> mNotes = new ArrayList<>();
     private NotesRecyclerAdapter mNoteRecyclerAdapter;
     private FloatingActionButton mFab;
-    private NoteDao mNoteDao;
-    private RetrieveAsyncTask mRetrieveAsyncTask;
     private DeleteAsyncTask mDeleteAsyncTask;
+    private NoteRepository mNoteRepository;
 
 
     @Override
@@ -58,7 +58,7 @@ public class NotesListActivity extends AppCompatActivity implements
         mFab.setOnClickListener(this);
 
         setupRecyclerView();
-        mNoteDao = AppDatabase.getDatabase(this).noteDataDao();
+        mNoteRepository = new NoteRepository(this);
 
         setSupportActionBar((Toolbar)findViewById(R.id.notes_toolbar));
         setTitle("Notes");
@@ -68,8 +68,8 @@ public class NotesListActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-//        retrieveNotes();
-        insertFakeNotes();
+        retrieveNotes();
+//        insertFakeNotes();
     }
 
     private void insertFakeNotes(){
@@ -86,21 +86,20 @@ public class NotesListActivity extends AppCompatActivity implements
 
     private void retrieveNotes() {
         Log.d(TAG, "retrieveNotes: called.");
-        if(mNotes.size() > 0){
-            mNotes.clear();
-        }
         showProgressbar();
-        mRetrieveAsyncTask = new RetrieveAsyncTask(mNoteDao, new AsyncCallback() {
+        mNoteRepository.retrieveNotesTask().observe(this, new Observer<List<Note>>() {
             @Override
-            public void doneRetrievingNotes(List<Note> notes) {
-                if(notes.size() > 0){
+            public void onChanged(@Nullable List<Note> notes) {
+                if(mNotes.size() > 0){
+                    mNotes.clear();
+                }
+                if(notes != null){
                     mNotes.addAll(notes);
                 }
                 mNoteRecyclerAdapter.notifyDataSetChanged();
                 hideProgressBar();
             }
         });
-        mRetrieveAsyncTask.execute();
     }
 
     private void deleteNote(Note note) {
@@ -108,18 +107,12 @@ public class NotesListActivity extends AppCompatActivity implements
         mNotes.remove(note);
         mNoteRecyclerAdapter.notifyDataSetChanged();
 
-        mDeleteAsyncTask = new DeleteAsyncTask(mNoteDao);
-        mDeleteAsyncTask.execute(note);
+        mNoteRepository.deleteNoteTask(note);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(mRetrieveAsyncTask != null){
-            mRetrieveAsyncTask.cancelTask();
-            mRetrieveAsyncTask.cancel(true);
-            mRetrieveAsyncTask = null;
-        }
         if(mDeleteAsyncTask != null){
             mDeleteAsyncTask.cancel(true);
             mDeleteAsyncTask = null;

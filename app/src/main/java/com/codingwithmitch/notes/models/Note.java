@@ -6,12 +6,13 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 
-@Entity
+@Entity(tableName = "notes")
 public class Note implements Parcelable{
 
     @PrimaryKey(autoGenerate = true)
-    private int uid;
+    private int id;
 
     @ColumnInfo(name = "title")
     private String title;
@@ -22,23 +23,25 @@ public class Note implements Parcelable{
     @ColumnInfo(name = "timestamp")
     private String timestamp;
 
-    @Ignore
+
     public Note(String title, String content, String timestamp) {
         this.title = title;
         this.content = content;
         this.timestamp = timestamp;
     }
 
+    @Ignore
     public Note() {
 
     }
 
-    public int getUid() {
-        return uid;
+
+    public int getId() {
+        return id;
     }
 
-    public void setUid(int uid) {
-        this.uid = uid;
+    public void setId(int uid) {
+        this.id = uid;
     }
 
     public String getTitle() {
@@ -66,24 +69,24 @@ public class Note implements Parcelable{
     }
 
 
-    @Override
-    public int describeContents() {
-        return 0;
+    protected Note(Parcel in) {
+        id = in.readInt();
+        title = in.readString();
+        content = in.readString();
+        timestamp = in.readString();
     }
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(uid);
+        dest.writeInt(id);
         dest.writeString(title);
         dest.writeString(content);
         dest.writeString(timestamp);
     }
 
-    protected Note(Parcel in) {
-        uid = in.readInt();
-        title = in.readString();
-        content = in.readString();
-        timestamp = in.readString();
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<Note> CREATOR = new Creator<Note>() {
@@ -97,4 +100,5 @@ public class Note implements Parcelable{
             return new Note[size];
         }
     };
+
 }

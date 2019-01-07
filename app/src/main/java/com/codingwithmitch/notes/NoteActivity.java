@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CoordinatorLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,8 +20,9 @@ import android.widget.TextView;
 import com.codingwithmitch.notes.async.InsertAsyncTask;
 import com.codingwithmitch.notes.async.UpdateAsyncTask;
 import com.codingwithmitch.notes.models.Note;
-import com.codingwithmitch.notes.persistence.AppDatabase;
+import com.codingwithmitch.notes.persistence.NoteDatabase;
 import com.codingwithmitch.notes.persistence.NoteDao;
+import com.codingwithmitch.notes.persistence.NoteRepository;
 import com.codingwithmitch.notes.util.Utility;
 
 
@@ -47,11 +47,11 @@ public class NoteActivity extends AppCompatActivity implements
 
     //vars
     private GestureDetector mGestureDetector;
-    private int mMode = EDIT_MODE_DISABLED;
+    private int mMode;
     private boolean mIsNewNote;
     private Note mNoteInitial = new Note();
     private Note mNoteFinal = new Note();
-    private NoteDao mNoteDao;
+    private NoteRepository mNoteRepository;
 
 
     @Override
@@ -75,7 +75,7 @@ public class NoteActivity extends AppCompatActivity implements
         mLinedEditText.addTextChangedListener(new ContentTextWatcher());
         mEditTitle.addTextChangedListener(new ContentTextWatcher());
 
-        mNoteDao = AppDatabase.getDatabase(this).noteDataDao();
+        mNoteRepository = new NoteRepository(this);
 
         if(getIncomingIntent()){
             setNewNoteProperties();
@@ -112,11 +112,11 @@ public class NoteActivity extends AppCompatActivity implements
     }
 
     public void saveNewNote() {
-        new InsertAsyncTask(mNoteDao).execute(mNoteFinal);
+        mNoteRepository.insertNoteTask(mNoteFinal);
     }
 
     public void updateNote() {
-        new UpdateAsyncTask(mNoteDao).execute(mNoteFinal);
+        mNoteRepository.updateNoteTask(mNoteFinal);
     }
 
 
@@ -139,16 +139,18 @@ public class NoteActivity extends AppCompatActivity implements
             mNoteInitial.setTitle(incomingNote.getTitle());
             mNoteInitial.setTimestamp(incomingNote.getTimestamp());
             mNoteInitial.setContent(incomingNote.getContent());
-            mNoteInitial.setUid(incomingNote.getUid());
+            mNoteInitial.setId(incomingNote.getId());
 
             mNoteFinal.setTitle(incomingNote.getTitle());
             mNoteFinal.setTimestamp(incomingNote.getTimestamp());
             mNoteFinal.setContent(incomingNote.getContent());
-            mNoteFinal.setUid(incomingNote.getUid());
+            mNoteFinal.setId(incomingNote.getId());
 
+            mMode = EDIT_MODE_DISABLED;
             mIsNewNote = false;
             return false;
         }
+        mMode = EDIT_MODE_ENABLED;
         mIsNewNote = true;
         return true;
     }
@@ -274,21 +276,17 @@ public class NoteActivity extends AppCompatActivity implements
         else{
             super.onBackPressed();
         }
-
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-
-        Log.d(TAG, "onTouch: called.");
-        if(v.getId() != R.id.toolbar_back_arrow
-                && v.getId() != R.id.toolbar_check){
-            if(v.getId() == R.id.note_text){
-                if(mMode == EDIT_MODE_DISABLED){
-                    return mGestureDetector.onTouchEvent(event);
-                }
-
+        if(v.getId() == R.id.note_text){
+            Log.d(TAG, "onTouch: 1");
+            if(mMode == EDIT_MODE_DISABLED){
+                Log.d(TAG, "onTouch: 2");
+                return mGestureDetector.onTouchEvent(event);
             }
+
         }
         return false;
     }
