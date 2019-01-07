@@ -1,12 +1,14 @@
 package com.codingwithmitch.notes;
 
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.View;
 
 import com.codingwithmitch.notes.adapters.NotesRecyclerAdapter;
 import com.codingwithmitch.notes.models.Note;
@@ -14,7 +16,10 @@ import com.codingwithmitch.notes.util.VerticalSpacingItemDecorator;
 
 import java.util.ArrayList;
 
-public class NotesListActivity extends AppCompatActivity implements NotesRecyclerAdapter.OnNoteListener {
+public class NotesListActivity extends AppCompatActivity implements
+        NotesRecyclerAdapter.OnNoteListener,
+        FloatingActionButton.OnClickListener
+{
 
     private static final String TAG = "NotesListActivity";
 
@@ -32,6 +37,7 @@ public class NotesListActivity extends AppCompatActivity implements NotesRecycle
         setContentView(R.layout.activity_notes_list);
         mRecyclerView = findViewById(R.id.recyclerView);
 
+        findViewById(R.id.fab).setOnClickListener(this);
 
         initRecyclerView();
         insertFakeNotes();
@@ -65,6 +71,12 @@ public class NotesListActivity extends AppCompatActivity implements NotesRecycle
     public void onNoteClick(int position) {
         Intent intent = new Intent(this, NoteActivity.class);
         intent.putExtra("selected_note", mNotes.get(position));
+        startActivity(intent);
+    }
+
+    @Override
+    public void onClick(View view) {
+        Intent intent = new Intent(this, NoteActivity.class);
         startActivity(intent);
     }
 }

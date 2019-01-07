@@ -39,4 +39,6 @@
         android:text="Dec 1 2017"
         android:padding="10dp" />
 
+
+
 </LinearLayout>
