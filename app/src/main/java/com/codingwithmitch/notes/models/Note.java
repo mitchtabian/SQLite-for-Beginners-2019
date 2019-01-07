@@ -1,12 +1,25 @@
 package com.codingwithmitch.notes.models;
 
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
+import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+@Entity(tableName = "notes")
 public class Note implements Parcelable {
 
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+
+    @ColumnInfo(name = "title")
     private String title;
+
+    @ColumnInfo(name = "content")
     private String content;
+
+    @ColumnInfo(name = "timestamp")
     private String timestamp;
 
     public Note(String title, String content, String timestamp) {
@@ -15,6 +28,7 @@ public class Note implements Parcelable {
         this.timestamp = timestamp;
     }
 
+    @Ignore
     public Note() {
 
     }
@@ -36,6 +50,14 @@ public class Note implements Parcelable {
             return new Note[size];
         }
     };
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getTitle() {
         return title;
