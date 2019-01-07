@@ -1,6 +1,8 @@
 package com.codingwithmitch.notes;
 
+import android.arch.lifecycle.Observer;
 import android.content.Intent;
+import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -13,9 +15,11 @@ import android.view.View;
 
 import com.codingwithmitch.notes.adapters.NotesRecyclerAdapter;
 import com.codingwithmitch.notes.models.Note;
+import com.codingwithmitch.notes.persistence.NoteRepository;
 import com.codingwithmitch.notes.util.VerticalSpacingItemDecorator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NotesListActivity extends AppCompatActivity implements
         NotesRecyclerAdapter.OnNoteListener,
@@ -30,6 +34,7 @@ public class NotesListActivity extends AppCompatActivity implements
     // vars
     private ArrayList<Note> mNotes = new ArrayList<>();
     private NotesRecyclerAdapter mNoteRecyclerAdapter;
+    private NoteRepository mNoteRepository;
 
 
     @Override
@@ -41,10 +46,27 @@ public class NotesListActivity extends AppCompatActivity implements
         findViewById(R.id.fab).setOnClickListener(this);
 
         initRecyclerView();
-        insertFakeNotes();
+        mNoteRepository = new NoteRepository(this);
+        retrieveNotes();
+//        insertFakeNotes();
 
         setSupportActionBar((Toolbar)findViewById(R.id.notes_toolbar));
         setTitle("Notes");
+    }
+
+    private void retrieveNotes() {
+        mNoteRepository.retrieveNotesTask().observe(this, new Observer<List<Note>>() {
+            @Override
+            public void onChanged(@Nullable List<Note> notes) {
+                if(mNotes.size() > 0){
+                    mNotes.clear();
+                }
+                if(notes != null){
+                    mNotes.addAll(notes);
+                }
+                mNoteRecyclerAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private void insertFakeNotes(){
