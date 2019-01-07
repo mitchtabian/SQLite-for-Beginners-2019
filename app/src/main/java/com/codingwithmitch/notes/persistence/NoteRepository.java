@@ -4,6 +4,7 @@ package com.codingwithmitch.notes.persistence;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 
+import com.codingwithmitch.notes.async.InsertAsyncTask;
 import com.codingwithmitch.notes.models.Note;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class NoteRepository {
     }
 
     public void insertNoteTask(Note note){
-
+        new InsertAsyncTask(mNoteDatabase.getNoteDao()).execute(note);
     }
 
     public void updateNoteTask(Note note){

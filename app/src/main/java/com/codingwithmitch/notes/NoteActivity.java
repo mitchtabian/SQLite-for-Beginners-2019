@@ -12,6 +12,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.codingwithmitch.notes.models.Note;
+import com.codingwithmitch.notes.persistence.NoteRepository;
 
 public class NoteActivity extends AppCompatActivity implements
         View.OnTouchListener,
@@ -37,6 +38,7 @@ public class NoteActivity extends AppCompatActivity implements
     private Note mNoteInitial;
     private GestureDetector mGestureDetector;
     private int mMode;
+    private NoteRepository mNoteRepository;
 
 
     @Override
@@ -51,6 +53,8 @@ public class NoteActivity extends AppCompatActivity implements
         mCheckContainer = findViewById(R.id.check_container);
         mBackArrowContainer = findViewById(R.id.back_arrow_container);
 
+        mNoteRepository = new NoteRepository(this);
+
         setListeners();
 
         if(getIncomingIntent()){
@@ -63,6 +67,18 @@ public class NoteActivity extends AppCompatActivity implements
             setNoteProperties();
             disableContentInteraction();
         }
+    }
+
+    private void saveChanges(){
+        if(mIsNewNote){
+            saveNewNote();
+        }else{
+            // update note
+        }
+    }
+
+    public void saveNewNote() {
+        mNoteRepository.insertNoteTask(mNoteInitial);
     }
 
     private void setListeners(){
@@ -124,6 +140,8 @@ public class NoteActivity extends AppCompatActivity implements
         mMode = EDIT_MODE_DISABLED;
 
         disableContentInteraction();
+
+        saveChanges();
     }
 
     private void setNewNoteProperties(){
