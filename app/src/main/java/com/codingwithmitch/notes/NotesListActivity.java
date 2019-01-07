@@ -54,6 +54,7 @@ public class NotesListActivity extends AppCompatActivity implements
         setTitle("Notes");
     }
 
+
     private void retrieveNotes() {
         mNoteRepository.retrieveNotesTask().observe(this, new Observer<List<Note>>() {
             @Override
