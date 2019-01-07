@@ -55,12 +55,13 @@ public class NoteActivity extends AppCompatActivity implements
 
         if(getIncomingIntent()){
             // this is a new note (EDIT MODE)
-            setNoteProperties();
+            // this is not a new note (VIEW MODE)
+            setNewNoteProperties();
             enableEditMode();
         }
         else{
-            // this is not a new note (VIEW MODE)
-            setNewNoteProperties();
+            setNoteProperties();
+            disableContentInteraction();
         }
     }
 
@@ -84,6 +85,22 @@ public class NoteActivity extends AppCompatActivity implements
         return true;
     }
 
+    private void disableContentInteraction(){
+        mLinedEditText.setKeyListener(null);
+        mLinedEditText.setFocusable(false);
+        mLinedEditText.setFocusableInTouchMode(false);
+        mLinedEditText.setCursorVisible(false);
+        mLinedEditText.clearFocus();
+    }
+
+    private void enableContentInteraction(){
+        mLinedEditText.setKeyListener(new EditText(this).getKeyListener());
+        mLinedEditText.setFocusable(true);
+        mLinedEditText.setFocusableInTouchMode(true);
+        mLinedEditText.setCursorVisible(true);
+        mLinedEditText.requestFocus();
+    }
+
     private void enableEditMode(){
         mBackArrowContainer.setVisibility(View.GONE);
         mCheckContainer.setVisibility(View.VISIBLE);
@@ -92,6 +109,8 @@ public class NoteActivity extends AppCompatActivity implements
         mEditTitle.setVisibility(View.VISIBLE);
 
         mMode = EDIT_MODE_ENABLED;
+
+        enableContentInteraction();
     }
 
     private void disableEditMode(){
@@ -102,6 +121,8 @@ public class NoteActivity extends AppCompatActivity implements
         mEditTitle.setVisibility(View.GONE);
 
         mMode = EDIT_MODE_DISABLED;
+
+        disableContentInteraction();
     }
 
     private void setNewNoteProperties(){
