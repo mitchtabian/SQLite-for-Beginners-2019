@@ -9,7 +9,6 @@ import android.arch.persistence.room.Update;
 
 import com.codingwithmitch.notes.models.Note;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -24,6 +23,6 @@ public interface NoteDao {
     @Delete
     int delete(Note note);
 
-    @Query("UPDATE notes SET title = :title, content = :content, timestamp = :timestamp WHERE id = :id")
-    int updateNote(String title, String content, String timestamp, int id);
+    @Update
+    int updateNotes(Note... notes);
 }

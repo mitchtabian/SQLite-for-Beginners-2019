@@ -16,8 +16,7 @@ public class UpdateAsyncTask extends AsyncTask<Note, Void, Void> {
 
     @Override
     protected Void doInBackground(Note... notes) {
-        Note note = notes[0];
-        mNoteDao.updateNote(note.getTitle(), note.getContent(), note.getTimestamp(), note.getId());
+        mNoteDao.updateNotes(notes);
         return null;
     }
 
