@@ -44,11 +44,11 @@ public class NoteActivity extends AppCompatActivity implements
 
         if(getIncomingIntent()){
             // this is a new note (EDIT MODE)
-            setNoteProperties();
+			setNewNoteProperties();
         }
         else{
             // this is note a new note (VIEW MODE)
-            setNewNoteProperties();
+            setNoteProperties();
         }
     }
 
