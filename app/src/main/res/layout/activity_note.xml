@@ -13,7 +13,7 @@
 
         <android.support.v7.widget.Toolbar
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/note_toolbar">
 
             <include layout="@layout/layout_note_toolbar"/>
@@ -27,10 +27,9 @@
         android:layout_height="match_parent"
         android:id="@+id/note_text"
         android:textSize="23sp"
-        android:background="@android:color/transparent"
-        android:gravity="top"
         android:textColor="#000"
         android:padding="5dp"
+        android:gravity="top"
         android:imeOptions="flagNoExtractUi"/>
 
 </LinearLayout>

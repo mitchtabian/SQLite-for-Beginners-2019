@@ -13,18 +13,19 @@ import com.codingwithmitch.notes.R;
 import com.codingwithmitch.notes.models.Note;
 import com.codingwithmitch.notes.util.Utility;
 
+
 import java.util.ArrayList;
 
 public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdapter.ViewHolder> {
 
     private static final String TAG = "NotesRecyclerAdapter";
+
     private ArrayList<Note> mNotes = new ArrayList<>();
     private OnNoteListener mOnNoteListener;
 
-
-    public NotesRecyclerAdapter(ArrayList<Note> mNotes, OnNoteListener mOnNoteListener) {
+    public NotesRecyclerAdapter(ArrayList<Note> mNotes, OnNoteListener onNoteListener) {
         this.mNotes = mNotes;
-        this.mOnNoteListener = mOnNoteListener;
+        this.mOnNoteListener = onNoteListener;
     }
 
     @NonNull
@@ -37,9 +38,8 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-
         try{
-            String month = mNotes.get(position).getTimestamp().substring(0,2);
+            String month = mNotes.get(position).getTimestamp().substring(0, 2);
             month = Utility.getMonthFromNumber(month);
             String year = mNotes.get(position).getTimestamp().substring(3);
             String timestamp = month + " " + year;
@@ -48,41 +48,51 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         }catch (NullPointerException e){
             Log.e(TAG, "onBindViewHolder: Null Pointer: " + e.getMessage() );
         }
-
     }
-
 
     @Override
     public int getItemCount() {
         return mNotes.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements
-            View.OnClickListener
-    {
-        TextView timestamp, title;
-        OnNoteListener clickListener;
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
-        public ViewHolder(View itemView, OnNoteListener clickListener) {
+        TextView timestamp, title;
+        OnNoteListener mOnNoteListener;
+
+        public ViewHolder(View itemView, OnNoteListener onNoteListener) {
             super(itemView);
             timestamp = itemView.findViewById(R.id.note_timestamp);
             title = itemView.findViewById(R.id.note_title);
-            this.clickListener = clickListener;
+            mOnNoteListener = onNoteListener;
 
             itemView.setOnClickListener(this);
         }
 
         @Override
-        public void onClick(View v) {
-            Log.d(TAG, "onClick: called.");
-            clickListener.onNoteClick(getAdapterPosition());
+        public void onClick(View view) {
+            Log.d(TAG, "onClick: " + getAdapterPosition());
+            mOnNoteListener.onNoteClick(getAdapterPosition());
         }
-
-
     }
 
     public interface OnNoteListener{
         void onNoteClick(int position);
     }
-
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -6,10 +6,9 @@ import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.NonNull;
 
 @Entity(tableName = "notes")
-public class Note implements Parcelable{
+public class Note implements Parcelable {
 
     @PrimaryKey(autoGenerate = true)
     private int id;
@@ -23,7 +22,6 @@ public class Note implements Parcelable{
     @ColumnInfo(name = "timestamp")
     private String timestamp;
 
-
     public Note(String title, String content, String timestamp) {
         this.title = title;
         this.content = content;
@@ -36,12 +34,31 @@ public class Note implements Parcelable{
     }
 
 
+    protected Note(Parcel in) {
+        id = in.readInt();
+        title = in.readString();
+        content = in.readString();
+        timestamp = in.readString();
+    }
+
+    public static final Creator<Note> CREATOR = new Creator<Note>() {
+        @Override
+        public Note createFromParcel(Parcel in) {
+            return new Note(in);
+        }
+
+        @Override
+        public Note[] newArray(int size) {
+            return new Note[size];
+        }
+    };
+
     public int getId() {
         return id;
     }
 
-    public void setId(int uid) {
-        this.id = uid;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getTitle() {
@@ -68,37 +85,26 @@ public class Note implements Parcelable{
         this.timestamp = timestamp;
     }
 
-
-    protected Note(Parcel in) {
-        id = in.readInt();
-        title = in.readString();
-        content = in.readString();
-        timestamp = in.readString();
-    }
-
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(id);
-        dest.writeString(title);
-        dest.writeString(content);
-        dest.writeString(timestamp);
+    public String toString() {
+        return "Note{" +
+                "title='" + title + '\'' +
+                ", content='" + content + '\'' +
+                ", timestamp='" + timestamp + '\'' +
+                '}';
     }
+
 
     @Override
     public int describeContents() {
         return 0;
     }
 
-    public static final Creator<Note> CREATOR = new Creator<Note>() {
-        @Override
-        public Note createFromParcel(Parcel in) {
-            return new Note(in);
-        }
-
-        @Override
-        public Note[] newArray(int size) {
-            return new Note[size];
-        }
-    };
-
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeInt(id);
+        parcel.writeString(title);
+        parcel.writeString(content);
+        parcel.writeString(timestamp);
+    }
 }

@@ -14,14 +14,14 @@ import java.util.List;
 @Dao
 public interface NoteDao {
 
-    @Query("SELECT * FROM notes")
-    LiveData<List<Note>> getNotes();
-
     @Insert
     long[] insertNotes(Note... notes);
 
+    @Query("SELECT * FROM notes")
+    LiveData<List<Note>> getNotes();
+
     @Delete
-    int delete(Note note);
+    int delete(Note... notes);
 
     @Update
     int updateNotes(Note... notes);

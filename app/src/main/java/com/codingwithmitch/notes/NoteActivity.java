@@ -1,36 +1,27 @@
 package com.codingwithmitch.notes;
 
-import android.app.Activity;
-import android.content.Context;
-import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.codingwithmitch.notes.async.InsertAsyncTask;
-import com.codingwithmitch.notes.async.UpdateAsyncTask;
 import com.codingwithmitch.notes.models.Note;
-import com.codingwithmitch.notes.persistence.NoteDatabase;
-import com.codingwithmitch.notes.persistence.NoteDao;
 import com.codingwithmitch.notes.persistence.NoteRepository;
 import com.codingwithmitch.notes.util.Utility;
 
-
 public class NoteActivity extends AppCompatActivity implements
-        View.OnClickListener,
         View.OnTouchListener,
         GestureDetector.OnGestureListener,
         GestureDetector.OnDoubleTapListener,
+        View.OnClickListener,
         TextWatcher
 {
 
@@ -38,44 +29,38 @@ public class NoteActivity extends AppCompatActivity implements
     private static final int EDIT_MODE_ENABLED = 1;
     private static final int EDIT_MODE_DISABLED = 0;
 
-    //ui components
+    // UI components
     private LinedEditText mLinedEditText;
-    private ImageButton mCheck, mBackArrow;
-    private RelativeLayout mCheckContainer, mBackArrowContainer;
     private EditText mEditTitle;
     private TextView mViewTitle;
+    private RelativeLayout mCheckContainer, mBackArrowContainer;
+    private ImageButton mCheck, mBackArrow;
 
-    //vars
+
+    // vars
+    private boolean mIsNewNote;
+    private Note mNoteInitial;
     private GestureDetector mGestureDetector;
     private int mMode;
-    private boolean mIsNewNote;
-    private Note mNoteInitial = new Note();
-    private Note mNoteFinal = new Note();
     private NoteRepository mNoteRepository;
+    private Note mNoteFinal;
 
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_note);
         mLinedEditText = findViewById(R.id.note_text);
+        mEditTitle = findViewById(R.id.note_edit_title);
+        mViewTitle = findViewById(R.id.note_text_title);
         mCheck = findViewById(R.id.toolbar_check);
         mBackArrow = findViewById(R.id.toolbar_back_arrow);
         mCheckContainer = findViewById(R.id.check_container);
         mBackArrowContainer = findViewById(R.id.back_arrow_container);
-        mEditTitle = findViewById(R.id.note_edit_title);
-        mViewTitle = findViewById(R.id.note_text_title);
-
-        mBackArrow.setOnClickListener(this);
-        mCheck.setOnClickListener(this);
-        mViewTitle.setOnClickListener(this);
-        mGestureDetector = new GestureDetector(this, this);
-        mLinedEditText.setOnTouchListener(this);
-        mEditTitle.addTextChangedListener(this);
-        mLinedEditText.addTextChangedListener(new ContentTextWatcher());
-        mEditTitle.addTextChangedListener(new ContentTextWatcher());
 
         mNoteRepository = new NoteRepository(this);
+
+        setListeners();
 
         if(getIncomingIntent()){
             setNewNoteProperties();
@@ -87,22 +72,6 @@ public class NoteActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putInt("mode", mMode);
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        mMode = savedInstanceState.getInt("mode");
-        if(mMode == EDIT_MODE_ENABLED){
-            enableEditMode();
-        }
-    }
-
-
     private void saveChanges(){
         if(mIsNewNote){
             saveNewNote();
@@ -111,107 +80,40 @@ public class NoteActivity extends AppCompatActivity implements
         }
     }
 
-    public void saveNewNote() {
-        mNoteRepository.insertNoteTask(mNoteFinal);
-    }
-
     public void updateNote() {
         mNoteRepository.updateNoteTask(mNoteFinal);
     }
 
-
-    private void setNewNoteProperties(){
-        mViewTitle.setText("Note Title");
-        mEditTitle.setText("Note Title");
-        appendNewLines();
+    public void saveNewNote() {
+        mNoteRepository.insertNoteTask(mNoteFinal);
     }
 
-    private void setNoteProperties(){
-        mViewTitle.setText(mNoteInitial.getTitle());
-        mEditTitle.setText(mNoteInitial.getTitle());
-        mLinedEditText.setText(mNoteInitial.getContent());
+    private void setListeners(){
+        mGestureDetector = new GestureDetector(this, this);
+        mLinedEditText.setOnTouchListener(this);
+        mCheck.setOnClickListener(this);
+        mViewTitle.setOnClickListener(this);
+        mBackArrow.setOnClickListener(this);
+        mEditTitle.addTextChangedListener(this);
     }
-
 
     private boolean getIncomingIntent(){
         if(getIntent().hasExtra("selected_note")){
-            Note incomingNote = getIntent().getParcelableExtra("selected_note");
-            mNoteInitial.setTitle(incomingNote.getTitle());
-            mNoteInitial.setTimestamp(incomingNote.getTimestamp());
-            mNoteInitial.setContent(incomingNote.getContent());
-            mNoteInitial.setId(incomingNote.getId());
+            mNoteInitial = getIntent().getParcelableExtra("selected_note");
 
-            mNoteFinal.setTitle(incomingNote.getTitle());
-            mNoteFinal.setTimestamp(incomingNote.getTimestamp());
-            mNoteFinal.setContent(incomingNote.getContent());
-            mNoteFinal.setId(incomingNote.getId());
+            mNoteFinal = new Note();
+            mNoteFinal.setTitle(mNoteInitial.getTitle());
+            mNoteFinal.setContent(mNoteInitial.getContent());
+            mNoteFinal.setTimestamp(mNoteInitial.getTimestamp());
+            mNoteFinal.setId(mNoteInitial.getId());
 
-            mMode = EDIT_MODE_DISABLED;
+            mMode = EDIT_MODE_ENABLED;
             mIsNewNote = false;
             return false;
         }
         mMode = EDIT_MODE_ENABLED;
         mIsNewNote = true;
         return true;
-    }
-
-    private void appendNewLines(){
-        String text = mLinedEditText.getText().toString();
-        StringBuilder sb = new StringBuilder();
-        sb.append(text);
-        for(int i = 0; i < 20; i++){
-            sb.append("\n");
-        }
-        mLinedEditText.setText(sb.toString());
-    }
-
-
-    private void enableEditMode(){
-        mBackArrowContainer.setVisibility(View.GONE);
-        mCheckContainer.setVisibility(View.VISIBLE);
-
-        mViewTitle.setVisibility(View.GONE);
-        mEditTitle.setVisibility(View.VISIBLE);
-
-        enableContentInteraction();
-
-        showSoftkeyboard();
-
-        mMode = EDIT_MODE_ENABLED;
-    }
-
-
-    private void disableEditMode(){
-        Log.d(TAG, "disableEditMode: called.");
-        hideSoftkeyboard();
-
-        mBackArrowContainer.setVisibility(View.VISIBLE);
-        mCheckContainer.setVisibility(View.GONE);
-
-        mViewTitle.setVisibility(View.VISIBLE);
-        mEditTitle.setVisibility(View.GONE);
-
-        disableContentInteraction();
-
-        mMode = EDIT_MODE_DISABLED;
-
-        // Check if they typed anything into the note. Don't want to save an empty note.
-        String temp = mLinedEditText.getText().toString();
-        temp = temp.replace("\n", "");
-        temp = temp.replace(" ", "");
-        if(temp.length() > 0){
-            mNoteFinal.setTitle(mEditTitle.getText().toString());
-            mNoteFinal.setContent(mLinedEditText.getText().toString());
-            String timestamp = Utility.getCurrentTimeStamp();
-            mNoteFinal.setTimestamp(timestamp);
-
-            // If the note was altered, save it.
-            if(!mNoteFinal.getContent().equals(mNoteInitial.getContent())
-                    || !mNoteFinal.getTitle().equals(mNoteInitial.getTitle())){
-                Log.d(TAG, "disableEditMode: SAVING NOTE: " + mLinedEditText.getText().toString());
-                saveChanges();
-            }
-        }
     }
 
     private void disableContentInteraction(){
@@ -230,27 +132,122 @@ public class NoteActivity extends AppCompatActivity implements
         mLinedEditText.requestFocus();
     }
 
-    private void showSoftkeyboard(){
-        InputMethodManager inputMethodManager =
-                (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.toggleSoftInputFromWindow(
-                mLinedEditText.getWindowToken(), InputMethodManager.SHOW_FORCED, 0);
+    private void enableEditMode(){
+        mBackArrowContainer.setVisibility(View.GONE);
+        mCheckContainer.setVisibility(View.VISIBLE);
+
+        mViewTitle.setVisibility(View.GONE);
+        mEditTitle.setVisibility(View.VISIBLE);
+
+        mMode = EDIT_MODE_ENABLED;
+
+        enableContentInteraction();
     }
 
-    private void hideSoftkeyboard(){
-        InputMethodManager imm = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //Find the currently focused view, so we can grab the correct window token from it.
-        View view = this.getCurrentFocus();
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = new View(this);
+    private void disableEditMode(){
+        Log.d(TAG, "disableEditMode: called.");
+        mBackArrowContainer.setVisibility(View.VISIBLE);
+        mCheckContainer.setVisibility(View.GONE);
+
+        mViewTitle.setVisibility(View.VISIBLE);
+        mEditTitle.setVisibility(View.GONE);
+
+        mMode = EDIT_MODE_DISABLED;
+
+        disableContentInteraction();
+
+        // Check if they typed anything into the note. Don't want to save an empty note.
+        String temp = mLinedEditText.getText().toString();
+        temp = temp.replace("\n", "");
+        temp = temp.replace(" ", "");
+        if(temp.length() > 0){
+            mNoteFinal.setTitle(mEditTitle.getText().toString());
+            mNoteFinal.setContent(mLinedEditText.getText().toString());
+            String timestamp = Utility.getCurrentTimeStamp();
+            mNoteFinal.setTimestamp(timestamp);
+
+            Log.d(TAG, "disableEditMode: initial: " + mNoteInitial.toString());
+            Log.d(TAG, "disableEditMode: final: " + mNoteFinal.toString());
+
+            // If the note was altered, save it.
+            if(!mNoteFinal.getContent().equals(mNoteInitial.getContent())
+                    || !mNoteFinal.getTitle().equals(mNoteInitial.getTitle())){
+                Log.d(TAG, "disableEditMode: called?");
+                saveChanges();
+            }
         }
-        imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
+    private void setNewNoteProperties(){
+        mViewTitle.setText("Note Title");
+        mEditTitle.setText("Note Title");
+
+        mNoteFinal = new Note();
+        mNoteInitial = new Note();
+        mNoteInitial.setTitle("Note Title");
+    }
+
+    private void setNoteProperties(){
+        mViewTitle.setText(mNoteInitial.getTitle());
+        mEditTitle.setText(mNoteInitial.getTitle());
+        mLinedEditText.setText(mNoteInitial.getContent());
     }
 
     @Override
-    public void onClick(View v) {
-        switch (v.getId()){
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+        return mGestureDetector.onTouchEvent(motionEvent);
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTap(MotionEvent motionEvent) {
+        Log.d(TAG, "onDoubleTap: double tapped.");
+        enableEditMode();
+        return false;
+    }
+
+    @Override
+    public boolean onDoubleTapEvent(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public boolean onDown(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public void onShowPress(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public boolean onSingleTapUp(MotionEvent motionEvent) {
+        return false;
+    }
+
+    @Override
+    public boolean onScroll(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+        return false;
+    }
+
+    @Override
+    public void onLongPress(MotionEvent motionEvent) {
+
+    }
+
+    @Override
+    public boolean onFling(MotionEvent motionEvent, MotionEvent motionEvent1, float v, float v1) {
+        return false;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
             case R.id.toolbar_back_arrow:{
                 finish();
                 break;
@@ -279,102 +276,45 @@ public class NoteActivity extends AppCompatActivity implements
     }
 
     @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        if(v.getId() == R.id.note_text){
-            Log.d(TAG, "onTouch: 1");
-            if(mMode == EDIT_MODE_DISABLED){
-                Log.d(TAG, "onTouch: 2");
-                return mGestureDetector.onTouchEvent(event);
-            }
-
-        }
-        return false;
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("mode", mMode);
     }
 
     @Override
-    public boolean onDown(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public void onShowPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-    }
-
-    @Override
-    public void onLongPress(MotionEvent e) {
-
-    }
-
-    @Override
-    public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        return false;
-    }
-
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public boolean onDoubleTap(MotionEvent e) {
-        enableEditMode();
-        return true;
-    }
-
-    @Override
-    public boolean onDoubleTapEvent(MotionEvent e) {
-        return false;
-    }
-
-    @Override
-    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-    }
-
-    @Override
-    public void onTextChanged(CharSequence s, int start, int before, int count) {
-        mViewTitle.setText(s.toString());
-    }
-
-    @Override
-    public void afterTextChanged(Editable s) {
-
-    }
-
-
-    private class ContentTextWatcher implements TextWatcher{
-
-        @Override
-        public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-        }
-
-        @Override
-        public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            mNoteFinal.setContent(mLinedEditText.getText().toString());
-            mNoteFinal.setTimestamp(Utility.getCurrentTimeStamp());
-            mNoteFinal.setTitle(mEditTitle.getText().toString());
-            Log.d(TAG, "onTextChanged: title: " + mNoteFinal.getTitle() + ", content: " + mNoteFinal.getContent());
-        }
-
-        @Override
-        public void afterTextChanged(Editable editable) {
-
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mMode = savedInstanceState.getInt("mode");
+        if(mMode == EDIT_MODE_ENABLED){
+            enableEditMode();
         }
     }
 
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        mViewTitle.setText(charSequence.toString());
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+
+    }
 }
+
+
+
+
+
+
+
+
+
+
 
 
 

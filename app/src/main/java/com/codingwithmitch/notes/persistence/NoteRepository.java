@@ -1,7 +1,7 @@
 package com.codingwithmitch.notes.persistence;
 
+
 import android.arch.lifecycle.LiveData;
-import android.arch.persistence.room.Room;
 import android.content.Context;
 
 import com.codingwithmitch.notes.async.DeleteAsyncTask;
@@ -13,15 +13,10 @@ import java.util.List;
 
 public class NoteRepository {
 
-    public static final String DATABASE_NAME = "notes_db";
     private NoteDatabase mNoteDatabase;
 
     public NoteRepository(Context context) {
-        mNoteDatabase = Room.databaseBuilder(
-                context.getApplicationContext(),
-                NoteDatabase.class,
-                DATABASE_NAME
-        ).build();
+        mNoteDatabase = NoteDatabase.getInstance(context);
     }
 
     public void insertNoteTask(Note note){
@@ -40,19 +35,6 @@ public class NoteRepository {
         new DeleteAsyncTask(mNoteDatabase.getNoteDao()).execute(note);
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
