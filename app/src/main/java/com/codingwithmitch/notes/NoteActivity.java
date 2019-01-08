@@ -76,8 +76,12 @@ public class NoteActivity extends AppCompatActivity implements
         if(mIsNewNote){
             saveNewNote();
         }else{
-            // update note
+            updateNote();
         }
+    }
+
+    public void updateNote() {
+        mNoteRepository.updateNoteTask(mNoteFinal);
     }
 
     public void saveNewNote() {
@@ -96,7 +100,12 @@ public class NoteActivity extends AppCompatActivity implements
     private boolean getIncomingIntent(){
         if(getIntent().hasExtra("selected_note")){
             mNoteInitial = getIntent().getParcelableExtra("selected_note");
-            mNoteFinal = getIntent().getParcelableExtra("selected_note");
+
+            mNoteFinal = new Note();
+            mNoteFinal.setTitle(mNoteInitial.getTitle());
+            mNoteFinal.setContent(mNoteInitial.getContent());
+            mNoteFinal.setTimestamp(mNoteInitial.getTimestamp());
+            mNoteFinal.setId(mNoteInitial.getId());
 
             mMode = EDIT_MODE_ENABLED;
             mIsNewNote = false;
@@ -136,6 +145,7 @@ public class NoteActivity extends AppCompatActivity implements
     }
 
     private void disableEditMode(){
+        Log.d(TAG, "disableEditMode: called.");
         mBackArrowContainer.setVisibility(View.VISIBLE);
         mCheckContainer.setVisibility(View.GONE);
 
@@ -156,9 +166,13 @@ public class NoteActivity extends AppCompatActivity implements
             String timestamp = Utility.getCurrentTimeStamp();
             mNoteFinal.setTimestamp(timestamp);
 
+            Log.d(TAG, "disableEditMode: initial: " + mNoteInitial.toString());
+            Log.d(TAG, "disableEditMode: final: " + mNoteFinal.toString());
+
             // If the note was altered, save it.
             if(!mNoteFinal.getContent().equals(mNoteInitial.getContent())
                     || !mNoteFinal.getTitle().equals(mNoteInitial.getTitle())){
+                Log.d(TAG, "disableEditMode: called?");
                 saveChanges();
             }
         }
