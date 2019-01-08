@@ -4,6 +4,7 @@ package com.codingwithmitch.notes.persistence;
 import android.arch.lifecycle.LiveData;
 import android.content.Context;
 
+import com.codingwithmitch.notes.async.DeleteAsyncTask;
 import com.codingwithmitch.notes.async.InsertAsyncTask;
 import com.codingwithmitch.notes.models.Note;
 
@@ -30,7 +31,7 @@ public class NoteRepository {
     }
 
     public void deleteNoteTask(Note note){
-
+        new DeleteAsyncTask(mNoteDatabase.getNoteDao()).execute(note);
     }
 }
 
