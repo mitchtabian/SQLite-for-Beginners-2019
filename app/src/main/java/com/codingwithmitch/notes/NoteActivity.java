@@ -166,6 +166,7 @@ public class NoteActivity extends AppCompatActivity implements
         mNoteFinal = new Note();
         mNoteInitial = new Note();
         mNoteInitial.setTitle("Note Title");
+		mNoteFinal.setTitle("Note Title");
     }
 
     private void setNoteProperties(){
