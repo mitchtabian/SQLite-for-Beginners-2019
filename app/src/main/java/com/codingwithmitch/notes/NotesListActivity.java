@@ -2,6 +2,7 @@ package com.codingwithmitch.notes;
 
 import android.arch.lifecycle.Observer;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -12,10 +13,12 @@ import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.view.View;
+import android.widget.AbsListView;
 
 import com.codingwithmitch.notes.adapters.NotesRecyclerAdapter;
 import com.codingwithmitch.notes.models.Note;
 import com.codingwithmitch.notes.persistence.NoteRepository;
+import com.codingwithmitch.notes.util.MyItemTouchHelper;
 import com.codingwithmitch.notes.util.VerticalSpacingItemDecorator;
 
 import java.util.ArrayList;
@@ -48,7 +51,6 @@ public class NotesListActivity extends AppCompatActivity implements
         initRecyclerView();
         mNoteRepository = new NoteRepository(this);
         retrieveNotes();
-//        insertFakeNotes();
 
         setSupportActionBar((Toolbar)findViewById(R.id.notes_toolbar));
         setTitle("Notes");
@@ -86,9 +88,26 @@ public class NotesListActivity extends AppCompatActivity implements
         mRecyclerView.setLayoutManager(linearLayoutManager);
         VerticalSpacingItemDecorator itemDecorator = new VerticalSpacingItemDecorator(10);
         mRecyclerView.addItemDecoration(itemDecorator);
-        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
         mNoteRecyclerAdapter = new NotesRecyclerAdapter(mNotes, this);
+//        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
+        ItemTouchHelper.Callback callback = new MyItemTouchHelper(mNoteRecyclerAdapter);
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        mNoteRecyclerAdapter.setTouchHelper(itemTouchHelper);
+        itemTouchHelper.attachToRecyclerView(mRecyclerView);
         mRecyclerView.setAdapter(mNoteRecyclerAdapter);
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
+                    mNoteRecyclerAdapter.isScrolling = false;
+                }
+                else{
+                    mNoteRecyclerAdapter.isScrolling = true;
+                }
+            }
+        });
     }
 
 
@@ -108,11 +127,14 @@ public class NotesListActivity extends AppCompatActivity implements
     private void deleteNote(Note note) {
         mNotes.remove(note);
         mNoteRecyclerAdapter.notifyDataSetChanged();
+
+        mNoteRepository.deleteNoteTask(note);
     }
 
     ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
         @Override
         public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+
             return false;
         }
 

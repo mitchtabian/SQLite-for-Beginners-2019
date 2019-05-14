@@ -3,24 +3,33 @@ package com.codingwithmitch.notes.adapters;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.codingwithmitch.notes.R;
 import com.codingwithmitch.notes.models.Note;
+import com.codingwithmitch.notes.util.ItemTouchHelperAdapter;
+import com.codingwithmitch.notes.util.Utility;
 
 
 import java.util.ArrayList;
 
-public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdapter.ViewHolder> {
+public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdapter.ViewHolder> implements
+        ItemTouchHelperAdapter
+{
 
     private static final String TAG = "NotesRecyclerAdapter";
 
     private ArrayList<Note> mNotes = new ArrayList<>();
     private OnNoteListener mOnNoteListener;
+    private ItemTouchHelper mTouchHelper;
+    public boolean isScrolling;
 
     public NotesRecyclerAdapter(ArrayList<Note> mNotes, OnNoteListener onNoteListener) {
         this.mNotes = mNotes;
@@ -37,9 +46,16 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
 
-
-        holder.timestamp.setText(mNotes.get(position).getTimestamp());
-        holder.title.setText(mNotes.get(position).getTitle());
+        try{
+            String month = mNotes.get(position).getTimestamp().substring(0, 2);
+            month = Utility.getMonthFromNumber(month);
+            String year = mNotes.get(position).getTimestamp().substring(3);
+            String timestamp = month + " " + year;
+            holder.timestamp.setText(timestamp);
+            holder.title.setText(mNotes.get(position).getTitle());
+        }catch (NullPointerException e){
+            Log.e(TAG, "onBindViewHolder: Null Pointer: " + e.getMessage() );
+        }
     }
 
     @Override
@@ -47,10 +63,35 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         return mNotes.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        Note fromNote = mNotes.get(fromPosition);
+        mNotes.remove(fromNote);
+        mNotes.add(toPosition, fromNote);
+        notifyItemMoved(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onItemSwiped(int position) {
+        mNotes.remove(position);
+        notifyItemRemoved(position);
+    }
+
+    public void setTouchHelper(ItemTouchHelper touchHelper){
+        this.mTouchHelper = touchHelper;
+    }
+
+
+
+    public class ViewHolder extends RecyclerView.ViewHolder implements
+//            View.OnClickListener,
+            View.OnTouchListener,
+            GestureDetector.OnGestureListener
+    {
 
         TextView timestamp, title;
         OnNoteListener mOnNoteListener;
+        GestureDetector mGestureDetector;
 
         public ViewHolder(View itemView, OnNoteListener onNoteListener) {
             super(itemView);
@@ -58,13 +99,58 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
             title = itemView.findViewById(R.id.note_title);
             mOnNoteListener = onNoteListener;
 
-            itemView.setOnClickListener(this);
+//            itemView.setOnClickListener(this);
+
+            mGestureDetector = new GestureDetector(itemView.getContext(), this);
+            itemView.setOnTouchListener(this);
+        }
+
+//        @Override
+//        public void onClick(View view) {
+//            Log.d(TAG, "onClick: " + getAdapterPosition());
+//            mOnNoteListener.onNoteClick(getAdapterPosition());
+//        }
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+
+                mGestureDetector.onTouchEvent(event);
+            }
+            return true;
         }
 
         @Override
-        public void onClick(View view) {
-            Log.d(TAG, "onClick: " + getAdapterPosition());
+        public boolean onDown(MotionEvent e) {
+            return false;
+        }
+
+        @Override
+        public void onShowPress(MotionEvent e) {
+
+        }
+
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
             mOnNoteListener.onNoteClick(getAdapterPosition());
+            return false;
+        }
+
+        @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            return false;
+        }
+
+        @Override
+        public void onLongPress(MotionEvent e) {
+            if(!isScrolling){
+                mTouchHelper.startDrag(this);
+            }
+        }
+
+        @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            return false;
         }
     }
 

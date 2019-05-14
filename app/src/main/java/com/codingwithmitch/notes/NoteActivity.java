@@ -2,6 +2,8 @@ package com.codingwithmitch.notes;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -13,12 +15,14 @@ import android.widget.TextView;
 
 import com.codingwithmitch.notes.models.Note;
 import com.codingwithmitch.notes.persistence.NoteRepository;
+import com.codingwithmitch.notes.util.Utility;
 
 public class NoteActivity extends AppCompatActivity implements
         View.OnTouchListener,
         GestureDetector.OnGestureListener,
         GestureDetector.OnDoubleTapListener,
-        View.OnClickListener
+        View.OnClickListener,
+        TextWatcher
 {
 
     private static final String TAG = "NoteActivity";
@@ -72,8 +76,12 @@ public class NoteActivity extends AppCompatActivity implements
         if(mIsNewNote){
             saveNewNote();
         }else{
-            // update note
+            updateNote();
         }
+    }
+
+    public void updateNote() {
+        mNoteRepository.updateNoteTask(mNoteFinal);
     }
 
     public void saveNewNote() {
@@ -86,12 +94,18 @@ public class NoteActivity extends AppCompatActivity implements
         mCheck.setOnClickListener(this);
         mViewTitle.setOnClickListener(this);
         mBackArrow.setOnClickListener(this);
+        mEditTitle.addTextChangedListener(this);
     }
 
     private boolean getIncomingIntent(){
         if(getIntent().hasExtra("selected_note")){
             mNoteInitial = getIntent().getParcelableExtra("selected_note");
-            mNoteFinal = getIntent().getParcelableExtra("selected_note");
+
+            mNoteFinal = new Note();
+            mNoteFinal.setTitle(mNoteInitial.getTitle());
+            mNoteFinal.setContent(mNoteInitial.getContent());
+            mNoteFinal.setTimestamp(mNoteInitial.getTimestamp());
+            mNoteFinal.setId(mNoteInitial.getId());
 
             mMode = EDIT_MODE_ENABLED;
             mIsNewNote = false;
@@ -131,6 +145,7 @@ public class NoteActivity extends AppCompatActivity implements
     }
 
     private void disableEditMode(){
+        Log.d(TAG, "disableEditMode: called.");
         mBackArrowContainer.setVisibility(View.VISIBLE);
         mCheckContainer.setVisibility(View.GONE);
 
@@ -148,12 +163,21 @@ public class NoteActivity extends AppCompatActivity implements
         if(temp.length() > 0){
             mNoteFinal.setTitle(mEditTitle.getText().toString());
             mNoteFinal.setContent(mLinedEditText.getText().toString());
-            String timestamp = "Jan 2019";
+            String timestamp = null;
+            try {
+                timestamp = Utility.getCurrentTimeStamp();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             mNoteFinal.setTimestamp(timestamp);
+
+            Log.d(TAG, "disableEditMode: initial: " + mNoteInitial.toString());
+            Log.d(TAG, "disableEditMode: final: " + mNoteFinal.toString());
 
             // If the note was altered, save it.
             if(!mNoteFinal.getContent().equals(mNoteInitial.getContent())
                     || !mNoteFinal.getTitle().equals(mNoteInitial.getTitle())){
+                Log.d(TAG, "disableEditMode: called?");
                 saveChanges();
             }
         }
@@ -166,7 +190,6 @@ public class NoteActivity extends AppCompatActivity implements
         mNoteFinal = new Note();
         mNoteInitial = new Note();
         mNoteInitial.setTitle("Note Title");
-		mNoteFinal.setTitle("Note Title");
     }
 
     private void setNoteProperties(){
@@ -270,6 +293,21 @@ public class NoteActivity extends AppCompatActivity implements
         if(mMode == EDIT_MODE_ENABLED){
             enableEditMode();
         }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+        mViewTitle.setText(charSequence.toString());
+    }
+
+    @Override
+    public void afterTextChanged(Editable editable) {
+
     }
 }
 
