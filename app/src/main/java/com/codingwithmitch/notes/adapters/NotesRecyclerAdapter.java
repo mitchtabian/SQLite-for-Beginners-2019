@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.codingwithmitch.notes.R;
 import com.codingwithmitch.notes.models.Note;
-import com.codingwithmitch.notes.temp.ItemTouchHelperAdapter;
+import com.codingwithmitch.notes.util.ItemTouchHelperAdapter;
 import com.codingwithmitch.notes.util.Utility;
 
 
