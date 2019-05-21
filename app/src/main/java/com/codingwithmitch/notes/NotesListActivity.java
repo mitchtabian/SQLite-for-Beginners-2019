@@ -89,8 +89,7 @@ public class NotesListActivity extends AppCompatActivity implements
         VerticalSpacingItemDecorator itemDecorator = new VerticalSpacingItemDecorator(10);
         mRecyclerView.addItemDecoration(itemDecorator);
         mNoteRecyclerAdapter = new NotesRecyclerAdapter(mNotes, this);
-//        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
-        ItemTouchHelper.Callback callback = new MyItemTouchHelper(mNoteRecyclerAdapter);
+		ItemTouchHelper.Callback callback = new MyItemTouchHelper(mNoteRecyclerAdapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         mNoteRecyclerAdapter.setTouchHelper(itemTouchHelper);
         itemTouchHelper.attachToRecyclerView(mRecyclerView);
@@ -100,12 +99,19 @@ public class NotesListActivity extends AppCompatActivity implements
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (newState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
-                    mNoteRecyclerAdapter.isScrolling = false;
+
+                switch (newState){
+                    case AbsListView.OnScrollListener.SCROLL_STATE_IDLE:{
+                        mNoteRecyclerAdapter.isScrolling = false;
+                        break;
+                    }
+
+                    default:{
+                        mNoteRecyclerAdapter.isScrolling = true;
+                        break;
+                    }
                 }
-                else{
-                    mNoteRecyclerAdapter.isScrolling = true;
-                }
+
             }
         });
     }
@@ -131,18 +137,7 @@ public class NotesListActivity extends AppCompatActivity implements
         mNoteRepository.deleteNoteTask(note);
     }
 
-    ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
-        @Override
-        public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
-
-            return false;
-        }
-
-        @Override
-        public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-            deleteNote(mNotes.get(viewHolder.getAdapterPosition()));
-        }
-    };
+  
 }
 
 

@@ -14,7 +14,7 @@ import android.widget.TextView;
 
 import com.codingwithmitch.notes.R;
 import com.codingwithmitch.notes.models.Note;
-import com.codingwithmitch.notes.util.ItemTouchHelperAdapter;
+import com.codingwithmitch.notes.temp.ItemTouchHelperAdapter;
 import com.codingwithmitch.notes.util.Utility;
 
 
@@ -63,6 +63,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         return mNotes.size();
     }
 
+
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
         Note fromNote = mNotes.get(fromPosition);
@@ -81,10 +82,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         this.mTouchHelper = touchHelper;
     }
 
-
-
     public class ViewHolder extends RecyclerView.ViewHolder implements
-//            View.OnClickListener,
             View.OnTouchListener,
             GestureDetector.OnGestureListener
     {
@@ -99,24 +97,14 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
             title = itemView.findViewById(R.id.note_title);
             mOnNoteListener = onNoteListener;
 
-//            itemView.setOnClickListener(this);
-
             mGestureDetector = new GestureDetector(itemView.getContext(), this);
             itemView.setOnTouchListener(this);
         }
 
-//        @Override
-//        public void onClick(View view) {
-//            Log.d(TAG, "onClick: " + getAdapterPosition());
-//            mOnNoteListener.onNoteClick(getAdapterPosition());
-//        }
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
-
-                mGestureDetector.onTouchEvent(event);
-            }
+            mGestureDetector.onTouchEvent(event);
             return true;
         }
 
@@ -133,7 +121,7 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         @Override
         public boolean onSingleTapUp(MotionEvent e) {
             mOnNoteListener.onNoteClick(getAdapterPosition());
-            return false;
+            return true;
         }
 
         @Override
@@ -144,7 +132,9 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         @Override
         public void onLongPress(MotionEvent e) {
             if(!isScrolling){
+
                 mTouchHelper.startDrag(this);
+
             }
         }
 
@@ -158,14 +148,6 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
         void onNoteClick(int position);
     }
 }
-
-
-
-
-
-
-
-
 
 
 
