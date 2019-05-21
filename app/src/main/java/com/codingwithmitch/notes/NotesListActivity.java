@@ -89,31 +89,12 @@ public class NotesListActivity extends AppCompatActivity implements
         VerticalSpacingItemDecorator itemDecorator = new VerticalSpacingItemDecorator(10);
         mRecyclerView.addItemDecoration(itemDecorator);
         mNoteRecyclerAdapter = new NotesRecyclerAdapter(mNotes, this);
-		ItemTouchHelper.Callback callback = new MyItemTouchHelper(mNoteRecyclerAdapter);
+//        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(mRecyclerView);
+        ItemTouchHelper.Callback callback = new MyItemTouchHelper(mNoteRecyclerAdapter);
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
         mNoteRecyclerAdapter.setTouchHelper(itemTouchHelper);
         itemTouchHelper.attachToRecyclerView(mRecyclerView);
         mRecyclerView.setAdapter(mNoteRecyclerAdapter);
-
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-
-                switch (newState){
-                    case AbsListView.OnScrollListener.SCROLL_STATE_IDLE:{
-                        mNoteRecyclerAdapter.isScrolling = false;
-                        break;
-                    }
-
-                    default:{
-                        mNoteRecyclerAdapter.isScrolling = true;
-                        break;
-                    }
-                }
-
-            }
-        });
     }
 
 

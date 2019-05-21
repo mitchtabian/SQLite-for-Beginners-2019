@@ -29,7 +29,6 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
     private ArrayList<Note> mNotes = new ArrayList<>();
     private OnNoteListener mOnNoteListener;
     private ItemTouchHelper mTouchHelper;
-    public boolean isScrolling;
 
     public NotesRecyclerAdapter(ArrayList<Note> mNotes, OnNoteListener onNoteListener) {
         this.mNotes = mNotes;
@@ -126,16 +125,12 @@ public class NotesRecyclerAdapter extends RecyclerView.Adapter<NotesRecyclerAdap
 
         @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-            return false;
+            return true;
         }
 
         @Override
         public void onLongPress(MotionEvent e) {
-            if(!isScrolling){
-
-                mTouchHelper.startDrag(this);
-
-            }
+            mTouchHelper.startDrag(this);
         }
 
         @Override
