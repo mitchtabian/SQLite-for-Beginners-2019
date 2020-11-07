@@ -1,3 +1,5 @@
+[![Hits](https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fmitchtabian%2FSQLite-for-Beginners-2019&count_bg=%2379C83D&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=PAGE+VIEWS&edge_flat=false)](https://hits.seeyoufarm.com)
+
 <a href='https://codingwithmitch.com/courses/sqlite-room-persistence-android/' target='_blank'><img class='header-img' src='https://codingwithmitch.s3.amazonaws.com/static/sqlite-room-persistence-android/images/SQlite_for_Beginners_2019.png' /></a>
 
 <h1><a href='https://codingwithmitch.com/courses/sqlite-room-persistence-android/' target='_blank'>Android SQLite for Beginners 2019</a></h1>
